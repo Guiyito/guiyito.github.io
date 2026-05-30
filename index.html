@@ -8,46 +8,68 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:system-ui,-apple-system,sans-serif;background:#fff;color:#111827}
 header{padding:14px 22px 8px;border-bottom:1px solid #F3F4F6}
-header h1{font-size:18px;font-weight:700}
+header h1{font-size:18px;font-weight:700;line-height:1.3}
 header p{font-size:11px;color:#9CA3AF;margin-top:2px}
-.tab-nav{display:flex;border-bottom:2px solid #E5E7EB;padding:0 22px;gap:2px}
-.tab-btn{padding:10px 20px;font-size:13px;font-weight:500;border:none;background:none;
-  cursor:pointer;color:#9CA3AF;border-bottom:3px solid transparent;margin-bottom:-2px;
-  transition:color .15s,border-color .15s}
+
+.tab-nav{display:flex;align-items:stretch;border-bottom:2px solid #E5E7EB;padding:0 8px 0 22px;gap:6px}
+.tab-scroll{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+.tab-scroll::-webkit-scrollbar{display:none}
+.tab-btn{padding:10px 16px;font-size:13px;font-weight:500;border:none;background:none;
+  cursor:pointer;color:#9CA3AF;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;flex-shrink:0}
 .tab-btn.active{color:#111827;border-bottom-color:#2563EB}
-.tab-btn:hover:not(.active){color:#374151}
 .tab-pane{display:none}.tab-pane.active{display:block}
-.legend{display:flex;flex-wrap:wrap;gap:14px;padding:9px 22px 10px;border-bottom:1px solid #F3F4F6}
+
+.zoom-ctrl{display:inline-flex;gap:3px;flex-shrink:0;align-items:center;padding-bottom:4px}
+.zoom-ctrl button{width:26px;height:26px;font-size:15px;font-weight:700;line-height:1;
+  border:1px solid #E5E7EB;background:#F9FAFB;border-radius:6px;color:#374151;cursor:pointer}
+.zoom-ctrl button:active{background:#E5E7EB}
+
+.legend{display:flex;flex-wrap:wrap;gap:10px;padding:9px 16px 10px;border-bottom:1px solid #F3F4F6}
 .li{display:flex;align-items:center;gap:6px;font-size:11px;color:#374151}
 .ld{width:12px;height:12px;border-radius:50%;flex-shrink:0}
-.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-svg{display:block}
-.node{cursor:pointer}.node circle{transition:filter .15s}
-.node:hover circle{filter:brightness(0.82)}
-.node.sel circle{filter:brightness(0.72) drop-shadow(0 0 4px rgba(0,0,0,.22))}
-#panel{margin:10px 0 18px 22px;width:1538px;padding:14px 18px;background:#F9FAFB;
-  border-radius:8px;border:1px solid #E5E7EB;min-height:56px}
-.p-empty{font-size:13px;color:#9CA3AF}
-#p-title{font-size:14px;font-weight:600;color:#111827;margin-bottom:3px;line-height:1.35}
-#p-year{font-size:11px;color:#6B7280;margin-bottom:7px}
-#p-desc{font-size:13px;color:#374151;line-height:1.65}
+
+/* SVG: simple native horizontal scroll. Pinch-zoom uses the browser's own gesture. */
+.scroll{position:relative;width:100%;overflow:auto;-webkit-overflow-scrolling:touch;border-bottom:1px solid #F3F4F6;max-height:70vh}
+svg{display:block;transform-origin:0 0}
+.node{cursor:pointer}
+.node circle{transition:filter .15s}
+.node:active circle,.node.sel circle{filter:brightness(0.72) drop-shadow(0 0 4px rgba(0,0,0,.25))}
+
+/* Detail panel — fixed at bottom, always visible when a node is chosen */
+#panel{position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:#fff;border-top:2px solid #E5E7EB;box-shadow:0 -4px 16px rgba(0,0,0,.08);
+  padding:16px 20px 20px;max-height:55vh;overflow-y:auto;transform:translateY(100%);
+  transition:transform .22s ease}
+#panel.open{transform:translateY(0)}
+#p-close{float:right;font-size:13px;font-weight:600;background:#F3F4F6;border:1px solid #E5E7EB;
+  border-radius:8px;color:#374151;cursor:pointer;padding:7px 13px;margin-left:12px}
+#p-title{font-size:15px;font-weight:700;color:#111827;margin-bottom:4px;line-height:1.35;
+  padding-right:8px;overflow-wrap:break-word}
+#p-year{font-size:12px;color:#6B7280;margin-bottom:10px;overflow-wrap:break-word}
+#p-desc{font-size:14px;color:#374151;line-height:1.65;overflow-wrap:break-word}
+.hint{font-size:11px;color:#9CA3AF;font-style:italic;padding:6px 22px;background:#FAFAFA;border-bottom:1px solid #F3F4F6}
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Guillermo B. Sentoni &nbsp;&#183;&nbsp; Scientific &amp; Institutional Portfolio</h1>
-  <p>Ph.D. Systems Control &middot; UNS 1997 &middot; Click any node for full details &nbsp;&#183;&nbsp; Scroll right for full timeline</p>
+  <h1>Guillermo Sentoni &nbsp;Sci. &amp; Inst. Portfolio</h1>
+  <p>Ph.D. Systems Control &middot; UNS 1997 &middot; Timeline 1995&#8211;present</p>
 </header>
 
 <div class="tab-nav">
-  <button id="btn-lnet"   class="tab-btn active" onclick="showTab('lnet')">&#9883; &nbsp;LNet Impact &nbsp;(1995&#8211;2026)</button>
-  <button id="btn-career" class="tab-btn"        onclick="showTab('career')">&#127963; &nbsp;Institutional Career &nbsp;(2000&#8211;present)</button>
+  <div class="tab-scroll">
+    <button id="btn-lnet"   class="tab-btn active" onclick="showTab('lnet')">&#9883; &nbsp;LNet Impact</button>
+    <button id="btn-career" class="tab-btn"        onclick="showTab('career')">&#127963; &nbsp;Institutional Career</button>
+  </div>
+  <div class="zoom-ctrl">
+    <button onclick="zoomActive(-1)" title="Zoom out">&#8722;</button>
+    <button onclick="zoomActive(1)" title="Zoom in">+</button>
+  </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     TAB 1: LNet Impact Timeline
-═══════════════════════════════════════════════════ -->
+<div class="hint">Tap for details &middot; scroll to pan &middot; use + / &#8722; to zoom</div>
+
 <div id="tab-lnet" class="tab-pane active">
 <div class="legend">
   <div class="li"><div class="ld" style="background:#FEF3C7;border:1.5px solid #D97706"></div>Thesis &amp; UNS era</div>
@@ -58,8 +80,8 @@ svg{display:block}
   <div class="li"><div class="ld" style="background:#EDE9FE;border:1.5px solid #7C3AED"></div>Citation impact</div>
   <div class="li" style="color:#9CA3AF;font-style:italic">- - - time gap</div>
 </div>
-<div class="scroll">
-<svg viewBox="0 0 1560 558" width="1560" height="558">
+<div class="scroll" id="scroll-lnet">
+<svg id="svg-lnet" viewBox="0 0 1560 566" width="1560" height="566">
 <rect x="0" y="44"  width="1560" height="72"  fill="#F9F9FB"/>
 <rect x="0" y="134" width="1560" height="72"  fill="#F4FDFB"/>
 <rect x="0" y="224" width="1560" height="82"  fill="#FFFCF4"/>
@@ -75,16 +97,16 @@ svg{display:block}
 <g transform="translate(40,0)">
 <!-- year axis -->
 <line x1="48" y1="532" x2="1510" y2="532" stroke="#E5E7EB"/>
-<line x1="72" y1="529" x2="72" y2="535" stroke="#9CA3AF"/><text x="72" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">1995</text>
-<line x1="215" y1="527" x2="215" y2="537" stroke="#9CA3AF" stroke-width="1.5"/><text x="215" y="549" text-anchor="middle" font-size="11" font-weight="600" fill="#374151">1997</text>
-<line x1="470" y1="529" x2="470" y2="535" stroke="#9CA3AF"/><text x="470" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2000</text>
-<line x1="604" y1="529" x2="604" y2="535" stroke="#9CA3AF"/><text x="604" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2004</text>
-<line x1="740" y1="529" x2="740" y2="535" stroke="#9CA3AF"/><text x="740" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2008</text>
-<line x1="860" y1="529" x2="860" y2="535" stroke="#9CA3AF"/><text x="860" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2011</text>
-<line x1="1020" y1="529" x2="1020" y2="535" stroke="#9CA3AF"/><text x="1020" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2015</text>
-<line x1="1140" y1="529" x2="1140" y2="535" stroke="#9CA3AF"/><text x="1140" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2018</text>
-<line x1="1300" y1="529" x2="1300" y2="535" stroke="#9CA3AF"/><text x="1300" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2022</text>
-<line x1="1460" y1="529" x2="1460" y2="535" stroke="#9CA3AF"/><text x="1460" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2026</text><line x1="1500" y1="529" x2="1500" y2="535" stroke="#9CA3AF"/><text x="1500" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2027</text>
+<line x1="72" y1="529" x2="72" y2="535" stroke="#9CA3AF"/><text x="72" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">1995</text>
+<line x1="215" y1="527" x2="215" y2="537" stroke="#9CA3AF" stroke-width="1.5"/><text x="215" y="556" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">1997</text>
+<line x1="470" y1="529" x2="470" y2="535" stroke="#9CA3AF"/><text x="470" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2000</text>
+<line x1="604" y1="529" x2="604" y2="535" stroke="#9CA3AF"/><text x="604" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2004</text>
+<line x1="740" y1="529" x2="740" y2="535" stroke="#9CA3AF"/><text x="740" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2008</text>
+<line x1="860" y1="529" x2="860" y2="535" stroke="#9CA3AF"/><text x="860" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2011</text>
+<line x1="1020" y1="529" x2="1020" y2="535" stroke="#9CA3AF"/><text x="1020" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2015</text>
+<line x1="1140" y1="529" x2="1140" y2="535" stroke="#9CA3AF"/><text x="1140" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2018</text>
+<line x1="1300" y1="529" x2="1300" y2="535" stroke="#9CA3AF"/><text x="1300" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2022</text>
+<line x1="1460" y1="529" x2="1460" y2="535" stroke="#9CA3AF"/><text x="1460" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2026</text><line x1="1500" y1="529" x2="1500" y2="535" stroke="#9CA3AF"/><text x="1500" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2027</text>
 <!-- branches: trunk (amber) -->
 <line x1="92" y1="265" x2="181" y2="265" stroke="#D97706" stroke-width="1.5"/>
 <line x1="156" y1="265" x2="181" y2="265" stroke="#D97706" stroke-width="1.5"/>
@@ -138,12 +160,10 @@ svg{display:block}
 <g class="node" data-id="anc"><circle cx="1460" cy="360" r="26" fill="#DCFCE7" stroke="#16A34A" stroke-width="2.5"/><text x="1460" y="356" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#14532D">ANC</text><text x="1460" y="369" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#16A34A">2026</text><text x="1460" y="395" text-anchor="middle" font-size="9" font-weight="700" fill="#16A34A">&#9733; Active &#183; 70% less var.</text><text x="1460" y="407" text-anchor="middle" font-size="8" fill="#16A34A">Sinopec 2025</text></g>
 </g>
 </svg>
+
 </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     TAB 2: Institutional Career Timeline
-═══════════════════════════════════════════════════ -->
 <div id="tab-career" class="tab-pane">
 <div class="legend">
   <div class="li"><div class="ld" style="background:#FEF9C3;border:1.5px solid #CA8A04"></div>Awards &amp; recognition</div>
@@ -152,8 +172,8 @@ svg{display:block}
   <div class="li"><div class="ld" style="background:#D1FAE5;border:1.5px solid #059669"></div>Industry &amp; Technology Transfer</div>
   <div class="li" style="color:#9CA3AF;font-style:italic">- - - career span</div>
 </div>
-<div class="scroll">
-<svg viewBox="0 0 1560 558" width="1560" height="558">
+<div class="scroll" id="scroll-career">
+<svg id="svg-career" viewBox="0 0 1560 566" width="1560" height="566">
 <rect x="0" y="44"  width="1560" height="72" fill="#FFFFF5"/>
 <rect x="0" y="134" width="1560" height="72" fill="#F8F8FF"/>
 <rect x="0" y="224" width="1560" height="82" fill="#FCF8FF"/>
@@ -166,16 +186,16 @@ svg{display:block}
 <g transform="translate(40,0)">
 <!-- year axis -->
 <line x1="48" y1="532" x2="1510" y2="532" stroke="#E5E7EB"/>
-<line x1="72" y1="529" x2="72" y2="535" stroke="#9CA3AF"/><text x="72" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">1995</text>
-<line x1="215" y1="527" x2="215" y2="537" stroke="#9CA3AF" stroke-width="1.5"/><text x="215" y="549" text-anchor="middle" font-size="11" font-weight="600" fill="#374151">1997</text>
-<line x1="470" y1="529" x2="470" y2="535" stroke="#9CA3AF"/><text x="470" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2000</text>
-<line x1="604" y1="529" x2="604" y2="535" stroke="#9CA3AF"/><text x="604" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2004</text>
-<line x1="740" y1="529" x2="740" y2="535" stroke="#9CA3AF"/><text x="740" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2008</text>
-<line x1="860" y1="529" x2="860" y2="535" stroke="#9CA3AF"/><text x="860" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2011</text>
-<line x1="1020" y1="529" x2="1020" y2="535" stroke="#9CA3AF"/><text x="1020" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2015</text>
-<line x1="1140" y1="529" x2="1140" y2="535" stroke="#9CA3AF"/><text x="1140" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2018</text>
-<line x1="1300" y1="529" x2="1300" y2="535" stroke="#9CA3AF"/><text x="1300" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2022</text>
-<line x1="1460" y1="529" x2="1460" y2="535" stroke="#9CA3AF"/><text x="1460" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2026</text><line x1="1500" y1="529" x2="1500" y2="535" stroke="#9CA3AF"/><text x="1500" y="546" text-anchor="middle" font-size="10" fill="#9CA3AF">2027</text>
+<line x1="72" y1="529" x2="72" y2="535" stroke="#9CA3AF"/><text x="72" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">1995</text>
+<line x1="215" y1="527" x2="215" y2="537" stroke="#9CA3AF" stroke-width="1.5"/><text x="215" y="556" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">1997</text>
+<line x1="470" y1="529" x2="470" y2="535" stroke="#9CA3AF"/><text x="470" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2000</text>
+<line x1="604" y1="529" x2="604" y2="535" stroke="#9CA3AF"/><text x="604" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2004</text>
+<line x1="740" y1="529" x2="740" y2="535" stroke="#9CA3AF"/><text x="740" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2008</text>
+<line x1="860" y1="529" x2="860" y2="535" stroke="#9CA3AF"/><text x="860" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2011</text>
+<line x1="1020" y1="529" x2="1020" y2="535" stroke="#9CA3AF"/><text x="1020" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2015</text>
+<line x1="1140" y1="529" x2="1140" y2="535" stroke="#9CA3AF"/><text x="1140" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2018</text>
+<line x1="1300" y1="529" x2="1300" y2="535" stroke="#9CA3AF"/><text x="1300" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2022</text>
+<line x1="1460" y1="529" x2="1460" y2="535" stroke="#9CA3AF"/><text x="1460" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2026</text><line x1="1500" y1="529" x2="1500" y2="535" stroke="#9CA3AF"/><text x="1500" y="553" text-anchor="middle" font-size="10" font-weight="700" fill="#6B7280">2027</text>
 <!-- academic spine -->
 <line x1="90" y1="170" x2="273" y2="170" stroke="#4338CA" stroke-width="1.6"/>
 <line x1="317" y1="170" x2="454" y2="170" stroke="#4338CA" stroke-width="1.6"/>
@@ -201,17 +221,15 @@ svg{display:block}
 <g class="node" data-id="uns_phd"><circle cx="72" cy="170" r="18" fill="#E0E7FF" stroke="#4338CA" stroke-width="1.5"/><text x="72" y="165" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="700" fill="#312E81">UNS</text><text x="72" y="177" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#3730A3">PhD</text><text x="72" y="198" text-anchor="middle" font-size="9" fill="#9CA3AF">1995&#8211;97</text></g><g class="node" data-id="cmu_career"><circle cx="295" cy="170" r="22" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/><text x="295" y="165" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="700" fill="#1E3A8A">CMU</text><text x="295" y="177" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#1E40AF">&#8217;97&#8211;&#8217;00</text><text x="295" y="201" text-anchor="middle" font-size="9" fill="#9CA3AF">Pittsburgh</text></g><g class="node" data-id="uns2000"><circle cx="470" cy="170" r="16" fill="#E0E7FF" stroke="#4338CA" stroke-width="1.5"/><text x="470" y="165" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="700" fill="#312E81">UNS</text><text x="470" y="177" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#3730A3">2000</text></g><g class="node" data-id="conicet"><circle cx="561" cy="170" r="22" fill="#E0E7FF" stroke="#4338CA" stroke-width="1.5"/><text x="561" y="165" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="700" fill="#312E81">UADE</text><text x="561" y="177" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#3730A3">CONICET</text><text x="561" y="201" text-anchor="middle" font-size="9" fill="#9CA3AF">2000&#8211;08</text></g><g class="node" data-id="ungs"><circle cx="725" cy="170" r="17" fill="#E0E7FF" stroke="#4338CA" stroke-width="1.5"/><text x="725" y="165" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="700" fill="#312E81">UNGS</text><text x="725" y="177" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#3730A3">2008</text></g><g class="node" data-id="unlam08"><circle cx="775" cy="170" r="20" fill="#E0E7FF" stroke="#4338CA" stroke-width="1.5"/><text x="775" y="165" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="700" fill="#312E81">UNLaM</text><text x="775" y="177" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#3730A3">2008</text><text x="775" y="198" text-anchor="middle" font-size="9" fill="#9CA3AF">Pro-Sec. CyT</text></g><g class="node" data-id="unsam11"><circle cx="860" cy="170" r="22" fill="#E0E7FF" stroke="#4338CA" stroke-width="1.5"/><text x="860" y="165" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="700" fill="#312E81">UNSaM</text><text x="860" y="177" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#3730A3">2011</text><text x="860" y="201" text-anchor="middle" font-size="9" fill="#9CA3AF">Sec. I+T</text></g><g class="node" data-id="unlam2015"><circle cx="1020" cy="170" r="22" fill="#E0E7FF" stroke="#4338CA" stroke-width="1.5"/><text x="1020" y="165" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="700" fill="#312E81">UNLaM</text><text x="1020" y="177" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#3730A3">2015&#8211;now</text><text x="1020" y="201" text-anchor="middle" font-size="9" fill="#9CA3AF">CeDIT Dir.</text></g><g class="node" data-id="sadosky12"><circle cx="900" cy="80" r="22" fill="#FEF9C3" stroke="#CA8A04" stroke-width="1.5"/><text x="900" y="73" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700" fill="#713F12">Sadosky</text><text x="900" y="86" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#92400E">2012</text><text x="900" y="111" text-anchor="middle" font-size="8" fill="#9CA3AF">Digital Inclusion</text></g><g class="node" data-id="sadosky15"><circle cx="1000" cy="80" r="20" fill="#FEF9C3" stroke="#CA8A04" stroke-width="1.5"/><text x="1000" y="73" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700" fill="#713F12">Sadosky</text><text x="1000" y="86" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#92400E">2015</text><text x="1000" y="109" text-anchor="middle" font-size="8" fill="#9CA3AF">Educ. innov.</text></g><g class="node" data-id="latinatec"><circle cx="1052" cy="80" r="18" fill="#FEF9C3" stroke="#CA8A04" stroke-width="1"/><text x="1052" y="74" text-anchor="middle" dominant-baseline="central" font-size="7" font-weight="700" fill="#713F12">LaTinatec</text><text x="1052" y="85" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#92400E">2015</text><text x="1052" y="119" text-anchor="middle" font-size="8" fill="#9CA3AF">Ibero-Am.</text></g><g class="node" data-id="uadelab"><circle cx="470" cy="265" r="22" fill="#F3E8FF" stroke="#7E22CE" stroke-width="1.5"/><text x="470" y="260" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="700" fill="#4A1D96">Lab</text><text x="470" y="272" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#6B21A8">2000</text><text x="470" y="296" text-anchor="middle" font-size="9" fill="#9CA3AF">UADE &#183; Signal img</text></g><g class="node" data-id="microlab"><circle cx="860" cy="265" r="28" fill="#F3E8FF" stroke="#7E22CE" stroke-width="2"/><text x="860" y="259" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="700" fill="#4A1D96">MicroLab</text><text x="860" y="272" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#6B21A8">2011</text><text x="860" y="301" text-anchor="middle" font-size="9" fill="#9CA3AF">~$1M &#183; MEMs &#183; CONAE</text></g><g class="node" data-id="imer"><circle cx="930" cy="360" r="15" fill="#D1FAE5" stroke="#059669" stroke-width="1.5"/><text x="930" y="358" text-anchor="middle" dominant-baseline="central" font-size="8" font-weight="700" fill="#064E3B">IMER</text><text x="930" y="384" text-anchor="middle" font-size="7" fill="#9CA3AF">&#8217;13-15</text></g><g class="node" data-id="cedit"><circle cx="1020" cy="265" r="28" fill="#F3E8FF" stroke="#7E22CE" stroke-width="2.5"/><text x="1020" y="259" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="700" fill="#4A1D96">CeDIT</text><text x="1020" y="272" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#6B21A8">2015</text><text x="1020" y="301" text-anchor="middle" font-size="9" fill="#9CA3AF">4500 m&#178; &#183; 12 companies</text></g><g class="node" data-id="medpole"><circle cx="1110" cy="265" r="20" fill="#F3E8FF" stroke="#7E22CE" stroke-width="1.5"/><text x="1110" y="260" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700" fill="#4A1D96">Med</text><text x="1110" y="271" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#6B21A8">Pole</text><text x="1110" y="294" text-anchor="middle" font-size="8" fill="#9CA3AF">2015-17</text></g><g class="node" data-id="pimax"><circle cx="604" cy="360" r="22" fill="#D1FAE5" stroke="#059669" stroke-width="1.5"/><text x="604" y="353" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="700" fill="#064E3B">Pimax</text><text x="604" y="367" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#065F46">2004</text><text x="604" y="391" text-anchor="middle" font-size="9" fill="#9CA3AF">X-Ray &#183; Exported</text></g><g class="node" data-id="caprinos"><circle cx="980" cy="360" r="19" fill="#D1FAE5" stroke="#059669" stroke-width="1.5"/><text x="980" y="356" text-anchor="middle" dominant-baseline="central" font-size="7" font-weight="700" fill="#064E3B">Caprinos</text><text x="980" y="366" text-anchor="middle" dominant-baseline="central" font-size="7" fill="#065F46">2014</text><text x="980" y="388" text-anchor="middle" font-size="8" fill="#9CA3AF">AR&#8211;CL IVF lab</text></g><g class="node" data-id="iberoeka"><circle cx="1060" cy="360" r="20" fill="#D1FAE5" stroke="#059669" stroke-width="1.5"/><text x="1060" y="353" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="700" fill="#064E3B">GyL</text><text x="1060" y="367" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#065F46">2016</text><text x="1060" y="389" text-anchor="middle" font-size="9" fill="#9CA3AF">R&amp;D Director</text></g><g class="node" data-id="lucem"><circle cx="1180" cy="360" r="23" fill="#D1FAE5" stroke="#059669" stroke-width="2"/><text x="1180" y="353" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="700" fill="#064E3B">Lucem</text><text x="1180" y="366" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#065F46">Radix 2019</text><text x="1180" y="392" text-anchor="middle" font-size="9" font-weight="600" fill="#059669">&#9733; Active</text></g><g class="node" data-id="inti"><circle cx="1235" cy="360" r="18" fill="#D1FAE5" stroke="#059669" stroke-width="1"/><text x="1235" y="353" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700" fill="#064E3B">INTI</text><text x="1235" y="366" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#065F46">2020</text><text x="1235" y="387" text-anchor="middle" font-size="8" fill="#9CA3AF">Industry 4.0</text></g>
 </g>
 </svg>
+
 </div>
 </div>
 
-<!-- ═══════════ SHARED DETAIL PANEL ═══════════ -->
 <div id="panel">
-  <p class="p-empty" id="p-empty">&#8592; Click any node on the timeline to see full details</p>
-  <div id="p-body" style="display:none">
-    <div id="p-title"></div>
-    <div id="p-year"></div>
-    <div id="p-desc"></div>
-  </div>
+  <button id="p-close" onclick="closePanel()">&#10005; Cerrar</button>
+  <div id="p-title"></div>
+  <div id="p-year"></div>
+  <div id="p-desc"></div>
 </div>
 
 <script>
@@ -250,18 +268,18 @@ const DATA = {
   inti:{t:"Industry 4.0 Scientific Consultant — INTI",y:"2020–2023 · Instituto Nacional de Tecnología Industrial, San Martín, Argentina",d:"Developed the Industry 4.0 area at Argentina's national industrial technology institute. Proposed growth roadmaps in R&D and HR training. Defined the technological roadmap and facilitated articulation between universities and industry stakeholders at the national level."}
 };
 
-function showDetail(id){
-  const d=DATA[id];if(!d)return;
-  document.getElementById('p-empty').style.display='none';
-  document.getElementById('p-body').style.display='block';
-  document.getElementById('p-title').textContent=d.t;
-  document.getElementById('p-title').style.cssText='font-size:14px;font-weight:600;color:#111827;margin-bottom:3px;line-height:1.35';
-  document.getElementById('p-year').textContent=d.y;
-  document.getElementById('p-year').style.cssText='font-size:11px;color:#6B7280;margin-bottom:7px';
-  document.getElementById('p-desc').textContent=d.d;
-  document.getElementById('p-desc').style.cssText='font-size:13px;color:#374151;line-height:1.65';
-}
 
+function showDetail(id){
+  var d=DATA[id]; if(!d) return;
+  document.getElementById('p-title').textContent=d.t;
+  document.getElementById('p-year').textContent=d.y;
+  document.getElementById('p-desc').textContent=d.d;
+  document.getElementById('panel').classList.add('open');
+}
+function closePanel(){
+  document.getElementById('panel').classList.remove('open');
+  var s=document.querySelector('.node.sel'); if(s) s.classList.remove('sel');
+}
 function showTab(tab){
   ['lnet','career'].forEach(function(t){
     document.getElementById('tab-'+t).classList.remove('active');
@@ -269,19 +287,46 @@ function showTab(tab){
   });
   document.getElementById('tab-'+tab).classList.add('active');
   document.getElementById('btn-'+tab).classList.add('active');
-  // reset panel
-  document.getElementById('p-empty').style.display='block';
-  document.getElementById('p-body').style.display='none';
-  document.querySelectorAll('.node').forEach(function(n){n.classList.remove('sel');});
+  activeTab=tab;
+  closePanel();
+  // fit the now-visible tab
+  var box=document.getElementById('scroll-'+tab);
+  if(box.clientWidth>0){ setZoom(tab, Math.min(1, box.clientWidth/1560)); }
 }
 
+// Simple, reliable node selection via native click (works on tap + mouse everywhere)
 document.querySelectorAll('.node').forEach(function(n){
   n.addEventListener('click',function(){
-    document.querySelectorAll('.node').forEach(function(x){x.classList.remove('sel');});
+    var s=document.querySelector('.node.sel'); if(s) s.classList.remove('sel');
     this.classList.add('sel');
     showDetail(this.getAttribute('data-id'));
   });
 });
+
+// Zoom only the SVG graphic (header/legend/detail stay fixed). + / − buttons.
+var zoomState={lnet:1, career:1};
+var BASE_W=1560, BASE_H=566;
+function setZoom(tab,z){
+  z=Math.max(0.3,Math.min(3,z));
+  zoomState[tab]=z;
+  var svg=document.getElementById('svg-'+tab);
+  svg.setAttribute('width', BASE_W*z);
+  svg.setAttribute('height', BASE_H*z);
+}
+function zoomSvg(tab,dir){
+  setZoom(tab, zoomState[tab] + dir*0.25);
+}
+var activeTab='lnet';
+function zoomActive(dir){ zoomSvg(activeTab,dir); }
+// initial fit: scale each SVG so it fits the container width
+function fitAll(){
+  ['lnet','career'].forEach(function(tab){
+    var box=document.getElementById('scroll-'+tab);
+    var w=box.clientWidth;
+    if(w>0){ setZoom(tab, Math.min(1, w/BASE_W)); }
+  });
+}
+window.addEventListener('load',fitAll);
 </script>
 </body>
 </html>
